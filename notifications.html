@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notification Settings - CleanstreetNYC</title>
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #4CAF50;
+            margin: 0;
+            font-size: 24px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+        
+        input[type="email"],
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        
+        .checkbox-group {
+            margin-bottom: 10px;
+        }
+        
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            font-weight: normal;
+            cursor: pointer;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+        }
+        
+        .time-preference {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .time-preference select {
+            flex: 1;
+        }
+        
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        .success-message {
+            padding: 15px;
+            background-color: #dff0d8;
+            border: 1px solid #d6e9c6;
+            color: #3c763d;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .error-message {
+            padding: 15px;
+            background-color: #f2dede;
+            border: 1px solid #ebccd1;
+            color: #a94442;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .back-link a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+        
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container {
+                margin: 20px;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Notification Settings</h1>
+            <p>Configure your parking notification preferences</p>
+        </div>
+        
+        <div class="success-message" id="success-message"></div>
+        <div class="error-message" id="error-message"></div>
+        
+        <form id="notification-form">
+            <div class="form-group">
+                <label for="notification-email">Email Address</label>
+                <input type="email" id="notification-email" placeholder="Enter your email for notifications">
+            </div>
+            
+            <div class="form-group">
+                <label for="address-input">Address for Notifications</label>
+                <input type="text" id="address-input" placeholder="Enter an NYC address">
+            </div>
+            
+            <div class="form-group">
+                <label>Notification Types</label>
+                <div class="checkbox-group">
+                    <label>
+                        <input type="checkbox" name="notification-type" value="street-cleaning" checked>
+                        Street Cleaning
+                    </label>
+                </div>
+                <div class="checkbox-group">
+                    <label>
+                        <input type="checkbox" name="notification-type" value="no-parking">
+                        No Parking
+                    </label>
+                </div>
+                <div class="checkbox-group">
+                    <label>
+                        <input type="checkbox" name="notification-type" value="parking-meter">
+                        Meter Expiry
+                    </label>
+                </div>
+                <div class="checkbox-group">
+                    <label>
+                        <input type="checkbox" name="notification-type" value="snow-emergency">
+                        Snow Emergency
+                    </label>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Notification Timing</label>
+                <div class="checkbox-group">
+                    <label>
+                        <input type="checkbox" name="notification-time" value="day-before" checked>
+                        Day Before (6:00 PM)
+                    </label>
+                </div>
+                <div class="checkbox-group">
+                    <label>
+                        <input type="checkbox" name="notification-time" value="morning-of">
+                        Morning Of (7:00 AM)
+                    </label>
+                </div>
+                <div class="checkbox-group">
+                    <label>
+                        <input type="checkbox" name="notification-time" value="hour-before">
+                        1 Hour Before
+                    </label>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Notification Frequency</label>
+                <select id="notification-frequency">
+                    <option value="always">Every Occurrence</option>
+                    <option value="weekly">Weekly Summary</option>
+                    <option value="changes">Only When Rules Change</option>
+                </select>
+            </div>
+            
+            <button type="submit" id="save-button">Save Notification Preferences</button>
+        </form>
+        
+        <div class="back-link">
+            <a href="index.html">Back to Map</a>
+        </div>
+    </div>
+    
+    <script>
+        // DOM elements
+        const notificationForm = document.getElementById('notification-form');
+        const notificationEmail = document.getElementById('notification-email');
+        const addressInput = document.getElementById('address-input');
+        const saveButton = document.getElementById('save-button');
+        const successMessage = document.getElementById('success-message');
+        const errorMessage = document.getElementById('error-message');
+        
+        // Show success message
+        function showSuccess(message) {
+            successMessage.textContent = message;
+            successMessage.style.display = 'block';
+            errorMessage.style.display = 'none';
+            
+            // Hide message after 5 seconds
+            setTimeout(() => {
+                successMessage.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Show error message
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            successMessage.style.display = 'none';
+        }
+        
+        // Validate email format
+        function isValidEmail(email) {
+            const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return regex.test(email);
+        }
+        
+        // Load current user and preferences
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is logged in
+            const currentUser = localStorage.getItem('cleanstreetCurrentUser');
+            if (!currentUser) {
+                // User is not logged in, redirect to login page
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Parse user data
+            const userData = JSON.parse(currentUser);
+            
+            // Set email from user data
+            notificationEmail.value = userData.email || '';
+            
+            // Load existing notification preferences if any
+            const savedPreferences = localStorage.getItem(`notificationPrefs_${userData.username}`);
+            if (savedPreferences) {
+                const prefs = JSON.parse(savedPreferences);
+                
+                // Fill the form with saved preferences
+                addressInput.value = prefs.address || '';
+                
+                // Set notification types
+                document.querySelectorAll('input[name="notification-type"]').forEach(checkbox => {
+                    if (prefs.types && prefs.types.includes(checkbox.value)) {
+                        checkbox.checked = true;
+                    } else {
+                        checkbox.checked = false;
+                    }
+                });
+                
+                // Set notification timing
+                document.querySelectorAll('input[name="notification-time"]').forEach(checkbox => {
+                    if (prefs.timing && prefs.timing.includes(checkbox.value)) {
+                        checkbox.checked = true;
+                    } else {
+                        checkbox.checked = false;
+                    }
+                });
+                
+                // Set frequency
+                const frequencySelect = document.getElementById('notification-frequency');
+                if (prefs.frequency) {
+                    frequencySelect.value = prefs.frequency;
+                }
+            }
+            
+            // Check if there's an address in URL parameters (passed from map page)
+            const urlParams = new URLSearchParams(window.location.search);
+            const addressParam = urlParams.get('address');
+            if (addressParam) {
+                addressInput.value = decodeURIComponent(addressParam);
+            }
+        });
+        
+        // Save notification preferences
+        notificationForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = notificationEmail.value.trim();
+            const address = addressInput.value.trim();
+            
+            // Validate form
+            if (!email) {
+                showError('Please enter your email address.');
+                return;
+            }
+            
+            if (!isValidEmail(email)) {
+                showError('Please enter a valid email address.');
+                return;
+            }
+            
+            if (!address) {
+                showError('Please enter an address for notifications.');
+                return;
+            }
+            
+            // Get selected notification types
+            const selectedTypes = [];
+            document.querySelectorAll('input[name="notification-type"]:checked').forEach(checkbox => {
+                selectedTypes.push(checkbox.value);
+            });
+            
+            if (selectedTypes.length === 0) {
+                showError('Please select at least one notification type.');
+                return;
+            }
+            
+            // Get selected timing preferences
+            const selectedTiming = [];
+            document.querySelectorAll('input[name="notification-time"]:checked').forEach(checkbox => {
+                selectedTiming.push(checkbox.value);
+            });
+            
+            if (selectedTiming.length === 0) {
+                showError('Please select at least one notification timing option.');
+                return;
+            }
+            
+            // Get frequency preference
+            const frequency = document.getElementById('notification-frequency').value;
+            
+            // Get current user
+            const currentUser = JSON.parse(localStorage.getItem('cleanstreetCurrentUser'));
+            
+            // Create notification preferences object
+            const notificationPrefs = {
+                email: email,
+                address: address,
+                types: selectedTypes,
+                timing: selectedTiming,
+                frequency: frequency,
+                lastUpdated: new Date().toISOString()
+            };
+            
+            // Save to localStorage
+            localStorage.setItem(`notificationPrefs_${currentUser.username}`, JSON.stringify(notificationPrefs));
+            
+            // Simulate API call
+            saveButton.textContent = 'Saving...';
+            saveButton.disabled = true;
+            
+            setTimeout(() => {
+                saveButton.textContent = 'Save Notification Preferences';
+                saveButton.disabled = false;
+                showSuccess('Notification preferences saved successfully! You will receive email notifications based on your settings.');
+            }, 1500);
+        });
+    </script>
+</body>
+</html>

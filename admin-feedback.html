@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CleanstreetNYC - Admin Feedback Dashboard</title>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+        .container {
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+        
+        .nav-links {
+            margin-bottom: 20px;
+        }
+        
+        .nav-links a {
+            color: #4CAF50;
+            text-decoration: none;
+            margin-right: 15px;
+        }
+        
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .feedback-message {
+            max-width: 300px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .feedback-details {
+            display: none;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+        
+        .feedback-details h2 {
+            color: #4CAF50;
+            margin-top: 0;
+        }
+        
+        .feedback-details p {
+            margin-bottom: 10px;
+        }
+        
+        .feedback-details-content {
+            background-color: white;
+            padding: 15px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        
+        .filter-container {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .filter-container select {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+        }
+        
+        .view-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .view-btn:hover {
+            background-color: #388e3c;
+        }
+        
+        .delete-btn {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+        
+        .delete-btn:hover {
+            background-color: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-links">
+            <a href="index.html">← Back to Map</a>
+        </div>
+        
+        <h1>CleanstreetNYC Feedback Dashboard</h1>
+        
+        <div class="filter-container">
+            <label for="filter-type">Filter by type:</label>
+            <select id="filter-type">
+                <option value="all">All Feedback</option>
+                <option value="bug">Bug Reports</option>
+                <option value="feature">Feature Suggestions</option>
+                <option value="data">Incorrect Sign Data</option>
+                <option value="usability">Usability Feedback</option>
+                <option value="other">Other</option>
+            </select>
+        </div>
+        
+        <div id="feedback-list">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Name</th>
+                        <th>Location</th>
+                        <th>Message</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="feedback-table-body">
+                    <!-- Feedback items will be added here dynamically -->
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="empty-state" id="empty-state" style="display:none;">
+            <h3>No feedback submissions yet</h3>
+            <p>When users submit feedback, it will appear here.</p>
+        </div>
+        
+        <div class="feedback-details" id="feedback-details">
+            <h2>Feedback Details</h2>
+            <p><strong>From:</strong> <span id="detail-name"></span> (<span id="detail-email"></span>)</p>
+            <p><strong>Type:</strong> <span id="detail-type"></span></p>
+            <p><strong>Date:</strong> <span id="detail-date"></span></p>
+            <p><strong>Location:</strong> <span id="detail-location"></span></p>
+            <p><strong>Message:</strong></p>
+            <div class="feedback-details-content" id="detail-message"></div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is logged in and is admin
+            const currentUser = localStorage.getItem('cleanstreetCurrentUser');
+            if (!currentUser) {
+                // User is not logged in, redirect to login page
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            const userData = JSON.parse(currentUser);
+            // In a real implementation, check if user has admin privileges
+            // For demo purposes, we'll skip this check
+            
+            const feedbackTableBody = document.getElementById('feedback-table-body');
+            const feedbackDetails = document.getElementById('feedback-details');
+            const emptyState = document.getElementById('empty-state');
+            const filterType = document.getElementById('filter-type');
+            
+            // Function to format date
+            function formatDate(dateString) {
+                const date = new Date(dateString);
+                return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+            }
+            
+            // Function to show feedback details
+            function showFeedbackDetails(feedback) {
+                document.getElementById('detail-name').textContent = feedback.name;
+                document.getElementById('detail-email').textContent = feedback.email;
+                document.getElementById('detail-type').textContent = getFeedbackTypeName(feedback.feedbackType);
+                document.getElementById('detail-date').textContent = formatDate(feedback.timestamp);
+                document.getElementById('detail-location').textContent = feedback.location || 'Not specified';
+                document.getElementById('detail-message').textContent = feedback.message;
+                
+                feedbackDetails.style.display = 'block';
+                
+                // Scroll to details
+                feedbackDetails.scrollIntoView({ behavior: 'smooth' });
+            }
+            
+            // Function to get readable feedback type name
+            function getFeedbackTypeName(type) {
+                const types = {
+                    'bug': 'Bug Report',
+                    'feature': 'Feature Suggestion',
+                    'data': 'Incorrect Sign Data',
+                    'usability': 'Usability Feedback',
+                    'other': 'Other'
+                };
+                return types[type] || type;
+            }
+            
+            // Function to delete feedback
+            function deleteFeedback(index, filterValue) {
+                // Get all feedback items
+                const allFeedback = JSON.parse(localStorage.getItem('cleanstreetFeedback') || '[]');
+                
+                // Get the currently displayed filtered items
+                const filteredItems = filterValue === 'all' 
+                    ? allFeedback 
+                    : allFeedback.filter(item => item.feedbackType === filterValue);
+                
+                // Get the feedback item to delete from the filtered list
+                const itemToDelete = filteredItems[index];
+                
+                // Find the index of this item in the complete list
+                const indexInAllFeedback = allFeedback.findIndex(item => 
+                    item.timestamp === itemToDelete.timestamp && 
+                    item.message === itemToDelete.message &&
+                    item.email === itemToDelete.email
+                );
+                
+                // Remove from the complete list
+                if (indexInAllFeedback !== -1) {
+                    allFeedback.splice(indexInAllFeedback, 1);
+                    
+                    // Update localStorage
+                    localStorage.setItem('cleanstreetFeedback', JSON.stringify(allFeedback));
+                    
+                    // Reload the table
+                    loadFeedback(filterValue);
+                    
+                    // Hide details if showing
+                    feedbackDetails.style.display = 'none';
+                    
+                    // Show confirmation
+                    alert('Feedback item has been deleted.');
+                }
+            }
+            
+            // Function to load and display feedback
+            function loadFeedback(filterValue = 'all') {
+                // Get feedback from localStorage
+                const feedbackItems = JSON.parse(localStorage.getItem('cleanstreetFeedback') || '[]');
+                
+                // Clear table
+                feedbackTableBody.innerHTML = '';
+                
+                // Filter items if needed
+                const filteredItems = filterValue === 'all' 
+                    ? feedbackItems 
+                    : feedbackItems.filter(item => item.feedbackType === filterValue);
+                
+                // Show empty state if no items
+                if (filteredItems.length === 0) {
+                    emptyState.style.display = 'block';
+                    return;
+                }
+                
+                emptyState.style.display = 'none';
+                
+                // Sort by date (newest first)
+                filteredItems.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                
+                // Add items to table
+                filteredItems.forEach((feedback, index) => {
+                    const row = document.createElement('tr');
+                    
+                    row.innerHTML = `
+                        <td>${formatDate(feedback.timestamp)}</td>
+                        <td>${getFeedbackTypeName(feedback.feedbackType)}</td>
+                        <td>${feedback.name}</td>
+                        <td>${feedback.location || 'Not specified'}</td>
+                        <td class="feedback-message">${feedback.message.substr(0, 50)}${feedback.message.length > 50 ? '...' : ''}</td>
+                        <td>
+                            <button class="view-btn" data-index="${index}">View</button>
+                            <button class="delete-btn" data-index="${index}">Delete</button>
+                        </td>
+                    `;
+                    
+                    feedbackTableBody.appendChild(row);
+                });
+                
+                // Add event listeners to view buttons
+                document.querySelectorAll('.view-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const index = this.getAttribute('data-index');
+                        showFeedbackDetails(filteredItems[index]);
+                    });
+                });
+                
+                // Add event listeners to delete buttons
+                document.querySelectorAll('.delete-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        if (confirm('Are you sure you want to delete this feedback item?')) {
+                            const index = this.getAttribute('data-index');
+                            deleteFeedback(index, filterType.value);
+                        }
+                    });
+                });
+            }
+            
+            // Load feedback initially
+            loadFeedback();
+            
+            // Add filter change event
+            filterType.addEventListener('change', function() {
+                loadFeedback(this.value);
+                feedbackDetails.style.display = 'none'; // Hide details when changing filter
+            });
+        });
+    </script>
+</body>
+</html>

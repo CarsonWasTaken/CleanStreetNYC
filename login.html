@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CleanstreetNYC - Login</title>
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/api/placeholder/1200/800');
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 400px;
+            padding: 30px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .logo h1 {
+            color: #4CAF50;
+            margin: 0;
+            font-size: 28px;
+        }
+        
+        .logo p {
+            margin: 5px 0 0 0;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .form-container {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+        
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        .alt-action {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .alt-action a {
+            color: #4CAF50;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        
+        .alt-action a:hover {
+            text-decoration: underline;
+        }
+        
+        .forgot-password {
+            text-align: right;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .forgot-password a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+        
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+        
+        #login-form, #signup-form, #forgot-form {
+            display: none;
+        }
+        
+        #login-form {
+            display: block;
+        }
+        
+        .back-to-login {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        
+        .success-message {
+            padding: 15px;
+            background-color: #dff0d8;
+            border: 1px solid #d6e9c6;
+            color: #3c763d;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .error-message {
+            padding: 15px;
+            background-color: #f2dede;
+            border: 1px solid #ebccd1;
+            color: #a94442;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <h1>CleanstreetNYC</h1>
+            <p>NYC Street Cleaning Signs Map</p>
+        </div>
+        
+        <div class="success-message" id="success-message"></div>
+        <div class="error-message" id="error-message"></div>
+        
+        <!-- Login Form -->
+        <div id="login-form" class="form-container">
+            <div class="form-group">
+                <label for="login-username">Username</label>
+                <input type="text" id="login-username" placeholder="Enter your username">
+            </div>
+            
+            <div class="form-group">
+                <label for="login-password">Password</label>
+                <input type="password" id="login-password" placeholder="Enter your password">
+            </div>
+            
+            <div class="forgot-password">
+                <a href="#" id="forgot-password-link">Forgot Password?</a>
+            </div>
+            
+            <button id="login-button">Log In</button>
+            
+            <div class="alt-action">
+                Don't have an account? <a href="#" id="signup-link">Sign Up</a>
+            </div>
+        </div>
+        
+        <!-- Sign Up Form -->
+        <div id="signup-form" class="form-container">
+            <div class="form-group">
+                <label for="signup-username">Username</label>
+                <input type="text" id="signup-username" placeholder="Choose a username">
+            </div>
+            
+            <div class="form-group">
+                <label for="signup-email">Email</label>
+                <input type="email" id="signup-email" placeholder="Enter your email">
+            </div>
+            
+            <div class="form-group">
+                <label for="signup-password">Password</label>
+                <input type="password" id="signup-password" placeholder="Choose a password">
+            </div>
+            
+            <div class="form-group">
+                <label for="signup-confirm">Confirm Password</label>
+                <input type="password" id="signup-confirm" placeholder="Confirm your password">
+            </div>
+            
+            <button id="signup-button">Create Account</button>
+            
+            <div class="alt-action">
+                Already have an account? <a href="#" id="login-link">Log In</a>
+            </div>
+        </div>
+        
+        <!-- Forgot Password Form -->
+        <div id="forgot-form" class="form-container">
+            <div class="form-group">
+                <label for="forgot-email">Email</label>
+                <input type="email" id="forgot-email" placeholder="Enter your email">
+            </div>
+            
+            <button id="reset-button">Reset Password</button>
+            
+            <div class="back-to-login">
+                <a href="#" id="back-to-login-link">Back to Login</a>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // DOM elements
+        const loginForm = document.getElementById('login-form');
+        const signupForm = document.getElementById('signup-form');
+        const forgotForm = document.getElementById('forgot-form');
+        const loginLink = document.getElementById('login-link');
+        const signupLink = document.getElementById('signup-link');
+        const forgotPasswordLink = document.getElementById('forgot-password-link');
+        const backToLoginLink = document.getElementById('back-to-login-link');
+        const loginButton = document.getElementById('login-button');
+        const signupButton = document.getElementById('signup-button');
+        const resetButton = document.getElementById('reset-button');
+        const successMessage = document.getElementById('success-message');
+        const errorMessage = document.getElementById('error-message');
+        
+        // Show login form
+        function showLoginForm() {
+            loginForm.style.display = 'block';
+            signupForm.style.display = 'none';
+            forgotForm.style.display = 'none';
+            clearMessages();
+        }
+        
+        // Show signup form
+        function showSignupForm() {
+            loginForm.style.display = 'none';
+            signupForm.style.display = 'block';
+            forgotForm.style.display = 'none';
+            clearMessages();
+        }
+        
+        // Show forgot password form
+        function showForgotForm() {
+            loginForm.style.display = 'none';
+            signupForm.style.display = 'none';
+            forgotForm.style.display = 'block';
+            clearMessages();
+        }
+        
+        // Clear messages
+        function clearMessages() {
+            successMessage.style.display = 'none';
+            errorMessage.style.display = 'none';
+        }
+        
+        // Show success message
+        function showSuccess(message) {
+            successMessage.textContent = message;
+            successMessage.style.display = 'block';
+            errorMessage.style.display = 'none';
+        }
+        
+        // Show error message
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            successMessage.style.display = 'none';
+        }
+        
+        // Validate email format
+        function isValidEmail(email) {
+            const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return regex.test(email);
+        }
+        
+        // Validate password strength
+        function isValidPassword(password) {
+            return password.length >= 8;
+        }
+        
+        // Load users from localStorage
+        function getUsers() {
+            const users = localStorage.getItem('cleanstreetUsers');
+            return users ? JSON.parse(users) : [];
+        }
+        
+        // Save users to localStorage
+        function saveUsers(users) {
+            localStorage.setItem('cleanstreetUsers', JSON.stringify(users));
+        }
+        
+        // Event Listeners
+        loginLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            showLoginForm();
+        });
+        
+        signupLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            showSignupForm();
+        });
+        
+        forgotPasswordLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            showForgotForm();
+        });
+        
+        backToLoginLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            showLoginForm();
+        });
+        
+        // Login form submission
+        loginButton.addEventListener('click', function() {
+            const username = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value;
+            
+            if (!username || !password) {
+                showError('Please enter both username and password.');
+                return;
+            }
+            
+            const users = getUsers();
+            const user = users.find(u => u.username === username && u.password === password);
+            
+            if (user) {
+                // Store logged in user
+                localStorage.setItem('cleanstreetCurrentUser', JSON.stringify(user));
+                showSuccess('Login successful! Redirecting...');
+                
+                // Redirect to main page after 1 second
+                setTimeout(function() {
+                    window.location.href = 'index.html';
+                }, 1000);
+            } else {
+                showError('Invalid username or password.');
+            }
+        });
+        
+        // Signup form submission
+        signupButton.addEventListener('click', function() {
+            const username = document.getElementById('signup-username').value.trim();
+            const email = document.getElementById('signup-email').value.trim();
+            const password = document.getElementById('signup-password').value;
+            const confirmPassword = document.getElementById('signup-confirm').value;
+            
+            // Basic validation
+            if (!username || !email || !password || !confirmPassword) {
+                showError('Please fill in all fields.');
+                return;
+            }
+            
+            if (!isValidEmail(email)) {
+                showError('Please enter a valid email address.');
+                return;
+            }
+            
+            if (!isValidPassword(password)) {
+                showError('Password must be at least 8 characters long.');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showError('Passwords do not match.');
+                return;
+            }
+            
+            // Check if username or email already exists
+            const users = getUsers();
+            if (users.some(u => u.username === username)) {
+                showError('Username already exists. Please choose another one.');
+                return;
+            }
+            
+            if (users.some(u => u.email === email)) {
+                showError('Email already in use. Please use another one or try to recover your password.');
+                return;
+            }
+            
+            // Add new user
+            const newUser = { username, email, password };
+            users.push(newUser);
+            saveUsers(users);
+            
+            showSuccess('Account created successfully! You can now log in.');
+            
+            // Clear the form and go back to login
+            document.getElementById('signup-username').value = '';
+            document.getElementById('signup-email').value = '';
+            document.getElementById('signup-password').value = '';
+            document.getElementById('signup-confirm').value = '';
+            
+            // Show login form after 2 seconds
+            setTimeout(showLoginForm, 2000);
+        });
+        
+        // Reset password form submission
+        resetButton.addEventListener('click', function() {
+            const email = document.getElementById('forgot-email').value.trim();
+            
+            if (!email) {
+                showError('Please enter your email address.');
+                return;
+            }
+            
+            if (!isValidEmail(email)) {
+                showError('Please enter a valid email address.');
+                return;
+            }
+            
+            // Check if email exists
+            const users = getUsers();
+            const user = users.find(u => u.email === email);
+            
+            if (!user) {
+                showError('No account found with this email address.');
+                return;
+            }
+            
+            // In a real application, send a password reset email here
+            // For this demo, we'll just show a success message
+            showSuccess('Password reset instructions have been sent to your email. Please check your inbox.');
+            
+            // Clear the form
+            document.getElementById('forgot-email').value = '';
+            
+            // Show login form after 3 seconds
+            setTimeout(showLoginForm, 3000);
+        });
+        
+        // Check if user is already logged in
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentUser = localStorage.getItem('cleanstreetCurrentUser');
+            if (currentUser) {
+                // User is already logged in, redirect to main page
+                window.location.href = 'index.html';
+            }
+        });
+    </script>
+</body>
+</html>
