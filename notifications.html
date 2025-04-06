@@ -47,6 +47,7 @@
         
         input[type="email"],
         input[type="text"],
+        input[type="tel"],
         select {
             width: 100%;
             padding: 12px;
@@ -71,6 +72,45 @@
             margin-right: 10px;
             width: 18px;
             height: 18px;
+        }
+        
+        .radio-group {
+            margin-bottom: 10px;
+        }
+        
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            font-weight: normal;
+            cursor: pointer;
+        }
+        
+        .radio-group input[type="radio"] {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+        }
+        
+        .notification-method {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .notification-method-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .notification-method-header label {
+            margin-bottom: 0;
+        }
+        
+        .method-details {
+            margin-left: 28px;
+            padding-top: 10px;
         }
         
         .time-preference {
@@ -133,6 +173,12 @@
             text-decoration: underline;
         }
         
+        .consent-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
         /* Responsive adjustments */
         @media (max-width: 768px) {
             .container {
@@ -154,13 +200,59 @@
         
         <form id="notification-form">
             <div class="form-group">
-                <label for="notification-email">Email Address</label>
-                <input type="email" id="notification-email" placeholder="Enter your email for notifications">
+                <label for="address-input">Address for Notifications</label>
+                <input type="text" id="address-input" placeholder="Enter an NYC address">
             </div>
             
             <div class="form-group">
-                <label for="address-input">Address for Notifications</label>
-                <input type="text" id="address-input" placeholder="Enter an NYC address">
+                <label>Notification Methods</label>
+                
+                <!-- Email Notification Method -->
+                <div class="notification-method">
+                    <div class="notification-method-header">
+                        <label>
+                            <input type="checkbox" id="email-notifications" name="notification-method" value="email" checked>
+                            Email Notifications
+                        </label>
+                    </div>
+                    
+                    <div class="method-details" id="email-details">
+                        <div class="form-group">
+                            <label for="notification-email">Email Address</label>
+                            <input type="email" id="notification-email" placeholder="Enter your email for notifications">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- SMS Notification Method -->
+                <div class="notification-method">
+                    <div class="notification-method-header">
+                        <label>
+                            <input type="checkbox" id="sms-notifications" name="notification-method" value="sms">
+                            SMS/Text Notifications
+                        </label>
+                    </div>
+                    
+                    <div class="method-details" id="sms-details" style="display: none;">
+                        <div class="form-group">
+                            <label for="notification-phone">Phone Number</label>
+                            <input type="tel" id="notification-phone" placeholder="Enter your phone number (e.g., 212-555-1234)">
+                            <p class="consent-text">By providing your phone number, you consent to receive text messages about parking notifications. Message and data rates may apply.</p>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>SMS Carrier</label>
+                            <select id="sms-carrier">
+                                <option value="">Select your carrier</option>
+                                <option value="att">AT&T</option>
+                                <option value="verizon">Verizon</option>
+                                <option value="tmobile">T-Mobile</option>
+                                <option value="sprint">Sprint</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
             </div>
             
             <div class="form-group">
@@ -234,10 +326,24 @@
         // DOM elements
         const notificationForm = document.getElementById('notification-form');
         const notificationEmail = document.getElementById('notification-email');
+        const notificationPhone = document.getElementById('notification-phone');
         const addressInput = document.getElementById('address-input');
         const saveButton = document.getElementById('save-button');
         const successMessage = document.getElementById('success-message');
         const errorMessage = document.getElementById('error-message');
+        const emailNotifications = document.getElementById('email-notifications');
+        const smsNotifications = document.getElementById('sms-notifications');
+        const emailDetails = document.getElementById('email-details');
+        const smsDetails = document.getElementById('sms-details');
+        
+        // Toggle notification method details
+        emailNotifications.addEventListener('change', function() {
+            emailDetails.style.display = this.checked ? 'block' : 'none';
+        });
+        
+        smsNotifications.addEventListener('change', function() {
+            smsDetails.style.display = this.checked ? 'block' : 'none';
+        });
         
         // Show success message
         function showSuccess(message) {
@@ -264,6 +370,23 @@
             return regex.test(email);
         }
         
+        // Validate phone number format (basic validation)
+        function isValidPhone(phone) {
+            // Accept formats like 212-555-1234, (212) 555-1234, 2125551234
+            const regex = /^[\d\s\-\(\)]+$/;
+            return regex.test(phone) && phone.replace(/[\s\-\(\)]/g, '').length >= 10;
+        }
+        
+        // Format phone number
+        function formatPhoneNumber(phoneNumberString) {
+            const cleaned = ('' + phoneNumberString).replace(/\D/g, '');
+            const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
+            if (match) {
+                return match[1] + '-' + match[2] + '-' + match[3];
+            }
+            return phoneNumberString;
+        }
+        
         // Load current user and preferences
         document.addEventListener('DOMContentLoaded', function() {
             // Check if user is logged in
@@ -288,6 +411,28 @@
                 // Fill the form with saved preferences
                 addressInput.value = prefs.address || '';
                 
+                // Set notification methods
+                if (prefs.methods) {
+                    if (prefs.methods.includes('email')) {
+                        emailNotifications.checked = true;
+                        emailDetails.style.display = 'block';
+                        notificationEmail.value = prefs.email || userData.email || '';
+                    } else {
+                        emailNotifications.checked = false;
+                        emailDetails.style.display = 'none';
+                    }
+                    
+                    if (prefs.methods.includes('sms')) {
+                        smsNotifications.checked = true;
+                        smsDetails.style.display = 'block';
+                        notificationPhone.value = prefs.phone || '';
+                        document.getElementById('sms-carrier').value = prefs.carrier || '';
+                    } else {
+                        smsNotifications.checked = false;
+                        smsDetails.style.display = 'none';
+                    }
+                }
+                
                 // Set notification types
                 document.querySelectorAll('input[name="notification-type"]').forEach(checkbox => {
                     if (prefs.types && prefs.types.includes(checkbox.value)) {
@@ -311,6 +456,12 @@
                 if (prefs.frequency) {
                     frequencySelect.value = prefs.frequency;
                 }
+            } else {
+                // Default state for new users
+                emailNotifications.checked = true;
+                smsNotifications.checked = false;
+                emailDetails.style.display = 'block';
+                smsDetails.style.display = 'none';
             }
             
             // Check if there's an address in URL parameters (passed from map page)
@@ -321,27 +472,72 @@
             }
         });
         
+        // Format phone number on blur
+        notificationPhone.addEventListener('blur', function() {
+            this.value = formatPhoneNumber(this.value);
+        });
+        
         // Save notification preferences
         notificationForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
-            const email = notificationEmail.value.trim();
             const address = addressInput.value.trim();
             
+            // Get selected notification methods
+            const selectedMethods = [];
+            let email = '';
+            let phone = '';
+            let carrier = '';
+            
             // Validate form
-            if (!email) {
-                showError('Please enter your email address.');
-                return;
-            }
-            
-            if (!isValidEmail(email)) {
-                showError('Please enter a valid email address.');
-                return;
-            }
-            
             if (!address) {
                 showError('Please enter an address for notifications.');
                 return;
+            }
+            
+            // Check if at least one notification method is selected
+            if (!emailNotifications.checked && !smsNotifications.checked) {
+                showError('Please select at least one notification method.');
+                return;
+            }
+            
+            // Validate email if selected
+            if (emailNotifications.checked) {
+                email = notificationEmail.value.trim();
+                if (!email) {
+                    showError('Please enter your email address.');
+                    return;
+                }
+                
+                if (!isValidEmail(email)) {
+                    showError('Please enter a valid email address.');
+                    return;
+                }
+                
+                selectedMethods.push('email');
+            }
+            
+            // Validate SMS if selected
+            if (smsNotifications.checked) {
+                phone = notificationPhone.value.trim();
+                carrier = document.getElementById('sms-carrier').value;
+                
+                if (!phone) {
+                    showError('Please enter your phone number.');
+                    return;
+                }
+                
+                if (!isValidPhone(phone)) {
+                    showError('Please enter a valid phone number.');
+                    return;
+                }
+                
+                if (!carrier) {
+                    showError('Please select your mobile carrier.');
+                    return;
+                }
+                
+                selectedMethods.push('sms');
             }
             
             // Get selected notification types
@@ -374,8 +570,11 @@
             
             // Create notification preferences object
             const notificationPrefs = {
-                email: email,
                 address: address,
+                methods: selectedMethods,
+                email: email,
+                phone: phone,
+                carrier: carrier,
                 types: selectedTypes,
                 timing: selectedTiming,
                 frequency: frequency,
@@ -392,7 +591,7 @@
             setTimeout(() => {
                 saveButton.textContent = 'Save Notification Preferences';
                 saveButton.disabled = false;
-                showSuccess('Notification preferences saved successfully! You will receive email notifications based on your settings.');
+                showSuccess('Notification preferences saved successfully! You will receive notifications based on your settings.');
             }, 1500);
         });
     </script>
