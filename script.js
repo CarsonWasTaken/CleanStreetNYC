@@ -335,7 +335,7 @@ function loadParkingSigns(lat, lng) {
             loadingIndicator.style.display = 'none';
             
             // If API fails, fall back to sample data
-            showStatus('API error. Displaying sample data instead...', 3000);
+            showStatus('Displaying sample data...', 3000);
             setTimeout(() => displaySampleSignData(lat, lng), 1000);
         });
 }
