@@ -154,6 +154,32 @@
             margin-bottom: 20px;
             display: none;
         }
+        
+        .checkbox-container {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+        
+        .checkbox-container input[type="checkbox"] {
+            margin-right: 10px;
+            margin-top: 2px;
+        }
+        
+        .checkbox-container label {
+            font-weight: normal;
+            font-size: 14px;
+            margin-bottom: 0;
+        }
+        
+        .checkbox-container a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+        
+        .checkbox-container a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -211,6 +237,11 @@
                 <input type="password" id="signup-confirm" placeholder="Confirm your password">
             </div>
             
+            <div class="checkbox-container">
+                <input type="checkbox" id="terms-checkbox">
+                <label for="terms-checkbox">I agree to the <a href="#" id="terms-link">Terms and Conditions</a> and <a href="#" id="privacy-link">Privacy Policy</a></label>
+            </div>
+            
             <button id="signup-button">Create Account</button>
             
             <div class="alt-action">
@@ -247,6 +278,9 @@
         const resetButton = document.getElementById('reset-button');
         const successMessage = document.getElementById('success-message');
         const errorMessage = document.getElementById('error-message');
+        const termsCheckbox = document.getElementById('terms-checkbox');
+        const termsLink = document.getElementById('terms-link');
+        const privacyLink = document.getElementById('privacy-link');
         
         // Show login form
         function showLoginForm() {
@@ -335,6 +369,16 @@
             showLoginForm();
         });
         
+        termsLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            alert('Terms and Conditions would open here.');
+        });
+        
+        privacyLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            alert('Privacy Policy would open here.');
+        });
+        
         // Login form submission
         loginButton.addEventListener('click', function() {
             const username = document.getElementById('login-username').value.trim();
@@ -375,6 +419,11 @@
                 return;
             }
             
+            if (!termsCheckbox.checked) {
+                showError('You must agree to the Terms and Conditions to create an account.');
+                return;
+            }
+            
             if (!isValidEmail(email)) {
                 showError('Please enter a valid email address.');
                 return;
@@ -403,7 +452,7 @@
             }
             
             // Add new user
-            const newUser = { username, email, password };
+            const newUser = { username, email, password, termsAccepted: true };
             users.push(newUser);
             saveUsers(users);
             
@@ -414,6 +463,7 @@
             document.getElementById('signup-email').value = '';
             document.getElementById('signup-password').value = '';
             document.getElementById('signup-confirm').value = '';
+            termsCheckbox.checked = false;
             
             // Show login form after 2 seconds
             setTimeout(showLoginForm, 2000);
@@ -442,6 +492,8 @@
                 return;
             }
             
+            // In a real application, send a password reset email here
+            // For this demo, we'll just show a success message
             showSuccess('Password reset instructions have been sent to your email. Please check your inbox.');
             
             // Clear the form
