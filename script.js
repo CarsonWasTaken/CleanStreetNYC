@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const currentUser = localStorage.getItem('cleanstreetCurrentUser');
     if (!currentUser) {
         // User is not logged in, redirect to login page
-        window.location.href = 'index.html';
+        window.location.href = 'login.html';
         return;
     }
     
