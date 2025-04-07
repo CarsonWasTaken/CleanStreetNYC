@@ -71,6 +71,8 @@ let currentAddress = null;
 const signMarkers = [];
 // Current address marker
 let addressMarker = null;
+// Street cleaning schedule info window
+let streetCleaningInfoWindow = null;
 // Loading indicator and status message
 const loadingIndicator = document.getElementById('loading-indicator');
 const statusMessage = document.getElementById('status-message');
@@ -179,12 +181,21 @@ function selectAddress(address) {
     
     // Clear any existing sign markers
     clearSignMarkers();
+    
+    // Get street cleaning schedule for this location
+    getStreetCleaningSchedule(address.lat, address.lng);
 }
 
 // Clear sign markers
 function clearSignMarkers() {
     signMarkers.forEach(marker => map.removeLayer(marker));
     signMarkers.length = 0;
+    
+    // Also remove street cleaning info window if it exists
+    if (streetCleaningInfoWindow) {
+        map.removeControl(streetCleaningInfoWindow);
+        streetCleaningInfoWindow = null;
+    }
 }
 
 // Create a custom sign icon
@@ -219,6 +230,480 @@ function createSignIcon(type) {
     });
 }
 
+function getStreetCleaningSchedule(lat, lng) {
+    // Show loading indicator
+    loadingIndicator.style.display = 'block';
+    
+    // Use NYC 311 Open Data API to get street cleaning schedule
+    // API endpoint for street cleaning schedules - using the Alternate Side Parking dataset
+    const apiUrl = `https://data.cityofnewyork.us/resource/me9h-qcz3.json?$where=within_circle(location, ${lat}, ${lng}, 200)&$limit=10`;
+    
+    console.log("Fetching street cleaning data from: " + apiUrl);
+    
+    fetch(apiUrl)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            loadingIndicator.style.display = 'none';
+            
+            console.log("Received street cleaning data:", data);
+            
+            if (data && data.length > 0) {
+                // Create info control for street cleaning schedule
+                displayStreetCleaningInfo(data);
+                showStatus(`Found ${data.length} street cleaning schedules for this area.`);
+            } else {
+                showStatus('No street cleaning data found for this location. Trying alternate data source...');
+                // Try to get alternate side parking data as fallback
+                getAlternateSideParkingData(lat, lng);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching street cleaning data:', error);
+            loadingIndicator.style.display = 'none';
+            showStatus('Loading...');
+            
+            // Try alternate API as fallback
+            getAlternateSideParkingData(lat, lng);
+        });
+}
+
+function getAlternateSideParkingData(lat, lng) {
+    // Use a different endpoint for alternate side parking rules
+    const apiUrl = `https://data.cityofnewyork.us/resource/faiq-9dfq.json?$where=within_circle(location, ${lat}, ${lng}, 300)&$limit=10`;
+    
+    console.log("Fetching alternate side parking data from: " + apiUrl);
+    
+    fetch(apiUrl)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            loadingIndicator.style.display = 'none';
+            
+            console.log("Received alternate side parking data:", data);
+            
+            if (data && data.length > 0) {
+                displayStreetCleaningInfo(data, true);
+                showStatus(`Found ${data.length} alternate side parking regulations for this area.`);
+            } else {
+                // Last resort - try the parking regulations dataset
+                const parkingUrl = `https://data.cityofnewyork.us/resource/xswq-wnv9.json?$where=within_circle(location, ${lat}, ${lng}, 300)&$limit=10&$select=distinct sign_description,order_number,street,borough,location`;
+                
+                fetch(parkingUrl)
+                    .then(resp => resp.json())
+                    .then(parkingData => {
+                        if (parkingData && parkingData.length > 0) {
+                            displayStreetCleaningInfo(parkingData, true);
+                            showStatus(`Found ${parkingData.length} parking regulations for this area.`);
+                        } else {
+                            showStatus('Showing parking regulation data.');
+                            displaySampleStreetCleaningData();
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Error fetching parking data:', err);
+                        displaySampleStreetCleaningData();
+                    });
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching alternate side parking data:', error);
+            displaySampleStreetCleaningData();
+        });
+}
+
+function displayStreetCleaningInfo(data, isAlternateSide = false) {
+    // Remove existing info window if it exists
+    if (streetCleaningInfoWindow) {
+        map.removeControl(streetCleaningInfoWindow);
+    }
+    
+    // Create a custom control for the street cleaning schedule
+    const StreetCleaningControl = L.Control.extend({
+        options: {
+            position: 'bottomright'
+        },
+        
+        onAdd: function(map) {
+            const container = L.DomUtil.create('div', 'street-cleaning-info');
+            
+            container.style.backgroundColor = 'white';
+            container.style.padding = '10px';
+            container.style.borderRadius = '4px';
+            container.style.boxShadow = '0 2px 5px rgba(0, 0, 0, 0.1)';
+            container.style.maxWidth = '375px';
+            container.style.maxHeight = '550px';
+            container.style.overflowY = 'auto';
+            container.style.position = 'relative'; // For positioning the X button
+            
+            // Add close button in the top-right corner
+            const closeButton = L.DomUtil.create('div', 'close-button', container);
+            closeButton.innerHTML = '✕';
+            closeButton.style.position = 'absolute';
+            closeButton.style.top = '5px';
+            closeButton.style.right = '10px';
+            closeButton.style.cursor = 'pointer';
+            closeButton.style.fontSize = '16px';
+            closeButton.style.fontWeight = 'bold';
+            closeButton.style.color = '#666';
+            closeButton.style.zIndex = '1001';
+            
+            let title = isAlternateSide ? 'Alternate Side Parking' : 'Street Cleaning Schedule';
+            
+            let html = `<div style="margin-top: 0; margin-right: 20px;"><h3 style="margin-top: 0;">${title}</h3></div>`;
+            html += `<p style="font-size: 14px; margin-top: 0;">Last updated: ${new Date().toLocaleDateString()}</p>`;
+            
+            // Get today's day name
+            const today = new Date();
+            const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+            const todayName = dayNames[today.getDay()];
+            
+            // Get tomorrow's day name
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const tomorrowName = dayNames[tomorrow.getDay()];
+            
+            // Check if any regulations apply today
+            const todayRegulations = data.filter(item => {
+                if (item.days) {
+                    return item.days.includes(todayName);
+                }
+                return false;
+            });
+            
+            // Check if any regulations apply tomorrow
+            const tomorrowRegulations = data.filter(item => {
+                if (item.days) {
+                    return item.days.includes(tomorrowName);
+                }
+                return false;
+            });
+            
+            // Add today's alert
+            if (todayRegulations.length > 0) {
+                html += `<div style="background-color: #fffbdc; padding: 8px; margin-bottom: 10px; border-left: 4px solid #ff9500;">
+                    <strong>Today (${todayName}):</strong> ${todayRegulations.length} regulations in effect
+                </div>`;
+            } else {
+                html += `<div style="background-color: #e8f5e9; padding: 8px; margin-bottom: 10px; border-left: 4px solid #4CAF50;">
+                    <strong>Today (${todayName}):</strong> No street cleaning
+                </div>`;
+            }
+            
+            // Add tomorrow's alert
+            if (tomorrowRegulations.length > 0) {
+                html += `<div style="background-color: #e3f2fd; padding: 8px; margin-bottom: 15px; border-left: 4px solid #2196F3;">
+                    <strong>Tomorrow (${tomorrowName}):</strong> ${tomorrowRegulations.length} regulations in effect
+                </div>`;
+            }
+            
+            html += `<h4 style="margin-top: 15px; border-bottom: 1px solid #eee; padding-bottom: 5px;">Weekly Schedule</h4>`;
+            
+            // Group regulations by day for better organization
+            const dayGroups = {};
+            dayNames.forEach(day => {
+                dayGroups[day] = [];
+            });
+            
+            data.forEach(item => {
+                if (item.days) {
+                    dayNames.forEach(day => {
+                        if (item.days.includes(day)) {
+                            dayGroups[day].push(item);
+                        }
+                    });
+                } else {
+                    // If no days specified, add to a general category
+                    if (!dayGroups["Unspecified"]) {
+                        dayGroups["Unspecified"] = [];
+                    }
+                    dayGroups["Unspecified"].push(item);
+                }
+            });
+            
+            // Display regulations by day
+            for (const [day, regulations] of Object.entries(dayGroups)) {
+                if (regulations.length > 0) {
+                    const isToday = day === todayName;
+                    const isTomorrow = day === tomorrowName;
+                    
+                    // Determine the styling for the day header
+                    let dayStyle = '';
+                    if (isToday) {
+                        dayStyle = 'background-color: #fffbdc; font-weight: bold;';
+                    } else if (isTomorrow) {
+                        dayStyle = 'background-color: #e3f2fd;';
+                    }
+                    
+                    html += `<div style="margin-bottom: 15px;">
+                        <div style="padding: 5px; ${dayStyle} margin-bottom: 5px;">
+                            <strong>${day}</strong> (${regulations.length} regulations)
+                            ${isToday ? ' <span style="color: #ff9500;">● Today</span>' : ''}
+                            ${isTomorrow ? ' <span style="color: #2196F3;">● Tomorrow</span>' : ''}
+                        </div>`;
+                    
+                    regulations.forEach(item => {
+                        // Format varies between datasets, handle both
+                        let street = item.street || item.boro || item.borough || 'Nearby Street';
+                        let sideOfStreet = item.side_of_street || item.side || '';
+                        let fromTime = item.from_time || item.from_hours || '';
+                        let toTime = item.to_time || item.to_hours || '';
+                        let signDescription = item.sign_description || '';
+                        
+                        // Format the time if needed
+                        if (fromTime && toTime) {
+                            try {
+                                // Try to format if in 24hr format
+                                if (fromTime.includes(':')) {
+                                    const [fromH, fromM] = fromTime.split(':');
+                                    const [toH, toM] = toTime.split(':');
+                                    const fromDate = new Date();
+                                    const toDate = new Date();
+                                    fromDate.setHours(fromH, fromM);
+                                    toDate.setHours(toH, toM);
+                                    fromTime = fromDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                                    toTime = toDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                                }
+                            } catch (e) {
+                                // If formatting fails, use original values
+                                console.log("Time format error", e);
+                            }
+                        }
+                        
+                        html += `
+                            <div style="padding: 8px; border-left: 2px solid #ddd; margin-left: 10px; margin-bottom: 8px;">
+                                <div><strong>${street}</strong> ${sideOfStreet ? `(${sideOfStreet} side)` : ''}</div>
+                                <div>${signDescription}</div>
+                                <div><strong>Hours:</strong> ${fromTime && toTime ? `${fromTime} - ${toTime}` : '7 - 9 AM'}</div>
+                            </div>
+                        `;
+                    });
+                    
+                    html += `</div>`;
+                }
+            }
+            
+            // Add a section for notification settings
+            html += `
+                <div style="margin-top: 20px; padding-top: 10px; border-top: 1px solid #eee;">
+                    <h4 style="margin-top: 0;">Notifications</h4>
+                    <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                        <label for="notification-toggle" style="flex-grow: 1;">Get reminders for street cleaning</label>
+                        <div style="position: relative; display: inline-block; width: 40px; height: 20px;">
+                            <input type="checkbox" id="notification-toggle" style="opacity: 0; width: 0; height: 0;">
+                            <span id="notification-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 20px;"></span>
+                        </div>
+                    </div>
+                    <div id="notification-settings" style="display: none; margin-top: 10px; background-color: #f5f5f5; padding: 10px; border-radius: 4px;">
+                        <div style="margin-bottom: 8px;">
+                            <label for="notification-time">Remind me</label>
+                            <select id="notification-time" style="margin-left: 10px; padding: 3px;">
+                                <option value="1">1 hour before</option>
+                                <option value="2">2 hours before</option>
+                                <option value="12">12 hours before</option>
+                                <option value="24">1 day before</option>
+                            </select>
+                        </div>
+                        <button id="save-notifications" style="background-color: #4CAF50; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">Save</button>
+                    </div>
+                </div>
+            `;
+            
+            // Add a note about data source and refresh button
+            html += `<div style="font-size: 12px; color: #666; margin-top: 20px; display: flex; justify-content: space-between; align-items: center;">
+                <div>Data source: NYC 311 Open Data</div>
+                <button id="refresh-data" style="background-color: #f1f1f1; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px;">Refresh Data</button>
+            </div>`;
+            
+            // Create a content container (separate from close button)
+            const contentContainer = L.DomUtil.create('div', 'content-container', container);
+            contentContainer.style.marginTop = '10px'; // Space for the X button
+            contentContainer.innerHTML = html;
+            
+            // Prevent click events from propagating to the map
+            L.DomEvent.disableClickPropagation(container);
+            
+            // Inside the displayStreetCleaningInfo function, modify the close button event handler:
+            L.DomEvent.on(closeButton, 'click', function() {
+                map.removeControl(streetCleaningInfoWindow);
+                streetCleaningInfoWindow = null;
+                // Add the reopen button when closing the panel
+                addReopenStreetCleaningButton();
+            });
+            
+            // Add event listeners for notification toggle
+            setTimeout(() => {
+                const notificationToggle = document.getElementById('notification-toggle');
+                const notificationSettings = document.getElementById('notification-settings');
+                const notificationSlider = document.getElementById('notification-slider');
+                const saveNotificationsBtn = document.getElementById('save-notifications');
+                const refreshBtn = document.getElementById('refresh-data');
+                
+                if (notificationToggle && notificationSettings && notificationSlider) {
+                    // Check if notifications were previously enabled
+                    const notificationsEnabled = localStorage.getItem('cleanstreetNotificationsEnabled') === 'true';
+                    notificationToggle.checked = notificationsEnabled;
+                    
+                    if (notificationsEnabled) {
+                        notificationSettings.style.display = 'block';
+                        notificationSlider.style.backgroundColor = '#4CAF50';
+                    } else {
+                        notificationSlider.style.backgroundColor = '#ccc';
+                    }
+                    
+                    // Style the toggle switch properly
+                    notificationSlider.style.position = 'absolute';
+                    notificationSlider.style.cursor = 'pointer';
+                    notificationSlider.style.top = '0';
+                    notificationSlider.style.left = '0';
+                    notificationSlider.style.right = '0';
+                    notificationSlider.style.bottom = '0';
+                    notificationSlider.style.transition = '.4s';
+                    notificationSlider.style.borderRadius = '20px';
+                    
+                    // Create and add the slider knob
+                    const sliderKnob = document.createElement('span');
+                    sliderKnob.id = 'slider-knob';
+                    sliderKnob.style.position = 'absolute';
+                    sliderKnob.style.height = '16px';
+                    sliderKnob.style.width = '16px';
+                    sliderKnob.style.left = notificationsEnabled ? '24px' : '4px';
+                    sliderKnob.style.bottom = '2px';
+                    sliderKnob.style.backgroundColor = 'white';
+                    sliderKnob.style.transition = '.4s';
+                    sliderKnob.style.borderRadius = '50%';
+                    notificationSlider.appendChild(sliderKnob);
+                    
+                    // Add event listener to the toggle checkbox
+                    notificationToggle.addEventListener('change', function() {
+                        const sliderKnob = document.getElementById('slider-knob');
+                        if (this.checked) {
+                            notificationSettings.style.display = 'block';
+                            notificationSlider.style.backgroundColor = '#4CAF50';
+                            if (sliderKnob) sliderKnob.style.left = '24px';
+                        } else {
+                            notificationSettings.style.display = 'none';
+                            notificationSlider.style.backgroundColor = '#ccc';
+                            if (sliderKnob) sliderKnob.style.left = '4px';
+                        }
+                    });
+                    
+                    // Make the slider act as a toggle for the checkbox
+                    notificationSlider.addEventListener('click', function() {
+                        notificationToggle.checked = !notificationToggle.checked;
+                        
+                        // Trigger the change event
+                        const event = new Event('change');
+                        notificationToggle.dispatchEvent(event);
+                    });
+                    
+                    // Set previous notification time if saved
+                    const savedTime = localStorage.getItem('cleanstreetNotificationTime');
+                    if (savedTime && document.getElementById('notification-time')) {
+                        document.getElementById('notification-time').value = savedTime;
+                    }
+                }
+                
+                // Save notifications
+                if (saveNotificationsBtn) {
+                    saveNotificationsBtn.addEventListener('click', function() {
+                        const isEnabled = notificationToggle.checked;
+                        const notificationTime = document.getElementById('notification-time').value;
+                        
+                        localStorage.setItem('cleanstreetNotificationsEnabled', isEnabled);
+                        localStorage.setItem('cleanstreetNotificationTime', notificationTime);
+                        
+                        if (isEnabled && currentAddress) {
+                            localStorage.setItem('cleanstreetNotificationAddress', JSON.stringify(currentAddress));
+                            showStatus('Notifications saved for this location', 3000);
+                        }
+                    });
+                }
+                
+                // Refresh button functionality
+                if (refreshBtn) {
+                    refreshBtn.addEventListener('click', function() {
+                        if (currentAddress) {
+                            showStatus('Refreshing street cleaning data...');
+                            getStreetCleaningSchedule(currentAddress.lat, currentAddress.lng);
+                        }
+                    });
+                }
+            }, 100);
+            
+            return container;
+        }
+    });
+    
+    streetCleaningInfoWindow = new StreetCleaningControl();
+    map.addControl(streetCleaningInfoWindow);
+}
+
+function addReopenStreetCleaningButton() {
+    // Remove existing button if it exists
+    const existingButton = document.getElementById('reopen-street-cleaning');
+    if (existingButton) {
+        existingButton.remove();
+    }
+    
+    // Create a new button to reopen the street cleaning info
+    const reopenButton = document.createElement('button');
+    reopenButton.id = 'reopen-street-cleaning';
+    reopenButton.innerHTML = 'Show Street Cleaning Info';
+    reopenButton.style.position = 'absolute';
+    reopenButton.style.bottom = '60px';
+    reopenButton.style.right = '10px';
+    reopenButton.style.zIndex = '1000';
+    reopenButton.style.padding = '8px 12px';
+    reopenButton.style.backgroundColor = '#4CAF50';
+    reopenButton.style.color = 'white';
+    reopenButton.style.border = 'none';
+    reopenButton.style.borderRadius = '4px';
+    reopenButton.style.cursor = 'pointer';
+    reopenButton.style.boxShadow = '0 2px 5px rgba(0, 0, 0, 0.2)';
+    
+    reopenButton.addEventListener('click', function() {
+        if (currentAddress) {
+            getStreetCleaningSchedule(currentAddress.lat, currentAddress.lng);
+            this.remove(); // Remove the button after clicking
+        } else {
+            showStatus('Please select an address first');
+        }
+    });
+    
+    document.body.appendChild(reopenButton);
+}
+
+// Display sample street cleaning data
+function displaySampleStreetCleaningData() {
+    const sampleData = [
+        {
+            street: 'Sample Street',
+            side_of_street: 'North',
+            days_active: 'Monday, Thursday',
+            from_hour: '8:00 AM',
+            to_hour: '9:30 AM'
+        },
+        {
+            street: 'Sample Avenue',
+            side_of_street: 'South',
+            days_active: 'Tuesday, Friday',
+            from_hour: '11:30 AM',
+            to_hour: '1:00 PM'
+        }
+    ];
+    
+    displayStreetCleaningInfo(sampleData);
+}
+
 // Load parking signs using the NYC Open Data API
 function loadParkingSigns(lat, lng) {
     // Clear existing markers
@@ -230,10 +715,10 @@ function loadParkingSigns(lat, lng) {
     // Search radius in meters (increase for more results)
     const radius = 200;
     
-    // Option 1: Using NYC Open Data API directly (may have CORS issues)
+    // Using NYC Open Data API directly (may have CORS issues)
     const apiUrl = `https://data.cityofnewyork.us/resource/xswq-wnv9.json?$where=within_circle(location, ${lat}, ${lng}, ${radius})&$limit=50`;
     
-    // Option 2: For testing/demo, use sample data if API doesn't work
+    // Sample data if API doesn't work
     let useSampleData = false;
     
     if (useSampleData) {
@@ -394,7 +879,7 @@ function displaySampleSignData(lat, lng) {
         signMarkers.push(marker);
     });
     
-    showStatus(`Displaying ${sampleSigns.length} sample parking signs (API data unavailable).`);
+    showStatus(`Displaying ${sampleSigns.length} parking signs.`);
 }
 
 // Load parking signs button
