@@ -744,7 +744,7 @@ function loadParkingSigns(lat, lng) {
             if (data && data.length > 0) {
                 data.forEach(sign => {
                     try {
-                        // Attempt to extract location data - this can vary based on API response format
+                        // Attempt to extract location data
                         let signLat, signLng;
                         
                         if (sign.location && sign.location.coordinates) {
