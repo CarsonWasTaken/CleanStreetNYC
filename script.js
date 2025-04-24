@@ -1,12 +1,10 @@
 // Check if user is logged in
 document.addEventListener('DOMContentLoaded', function() {
-    // Check if we have a skip_login parameter in the URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const skipLogin = urlParams.has('skip_login');
-    
     const currentUser = localStorage.getItem('cleanstreetCurrentUser');
-    if (!currentUser && !skipLogin) {
-        // User is not logged in and not skipping login, redirect to login page
+    const guestMode = localStorage.getItem('cleanstreetGuestMode');
+    
+    if (!currentUser && !guestMode) {
+        // User is not logged in and not in guest mode, redirect to login page
         window.location.href = 'login.html';
         return;
     }
