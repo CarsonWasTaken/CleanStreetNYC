@@ -1,9 +1,8 @@
 // Check if user is logged in
 document.addEventListener('DOMContentLoaded', function() {
-    // Get the URL parameters
+    // Check if we have a skip_login parameter in the URL
     const urlParams = new URLSearchParams(window.location.search);
-    // Check if we have a 'skip_login' parameter
-    const skipLogin = urlParams.get('skip_login');
+    const skipLogin = urlParams.has('skip_login');
     
     const currentUser = localStorage.getItem('cleanstreetCurrentUser');
     if (!currentUser && !skipLogin) {
