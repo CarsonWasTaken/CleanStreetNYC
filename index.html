@@ -250,6 +250,15 @@
                 window.location.href = 'map.html';
             }
         });
+
+        // Function to confirm guest mode with a warning
+        function confirmGuestMode() {
+            if (confirm("Warning: In guest mode, you won't be able to save or bookmark addresses. Continue without signing in?")) {
+                // User confirmed, set guest mode and redirect
+                localStorage.setItem('cleanstreetGuestMode', 'true');
+                window.location.href = 'map.html';
+            }
+        }
     </script>
 </body>
 </html>
