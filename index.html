@@ -207,7 +207,7 @@
         
         <div class="buttons">
             <a href="login.html" class="btn btn-primary">Sign In</a>
-            <a href="map.html" class="btn btn-primary" onclick="localStorage.setItem('cleanstreetGuestMode', 'true');">Skip to Map</a>
+            <a href="#" class="btn btn-primary" onclick="confirmGuestMode();">Skip to Map</a>
         </div>
         
         <div class="features">
@@ -250,10 +250,10 @@
                 window.location.href = 'map.html';
             }
         });
-
+        
         // Function to confirm guest mode with a warning
         function confirmGuestMode() {
-            if (confirm("Warning: In guest mode, you won't be able to save or bookmark addresses, and you will not be able to set future notifications. Continue without signing in?")) {
+            if (confirm("Warning: In guest mode, you won't be able to save or bookmark addresses, and you will not receive future notifications. Continue without signing in?")) {
                 // User confirmed, set guest mode and redirect
                 localStorage.setItem('cleanstreetGuestMode', 'true');
                 window.location.href = 'map.html';
