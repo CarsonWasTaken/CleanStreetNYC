@@ -236,13 +236,19 @@ function getStreetCleaningSchedule(lat, lng) {
     // Show loading indicator
     loadingIndicator.style.display = 'block';
     
-    // Use NYC 311 Open Data API to get street cleaning schedule
-    // API endpoint for street cleaning schedules - using the Alternate Side Parking dataset
-    const apiUrl = `https://data.cityofnewyork.us/resource/me9h-qcz3.json?$where=within_circle(location, ${lat}, ${lng}, 200)&$limit=10`;
+    // Use the new NYC Parking Regulation API endpoint
+    // API endpoint for parking regulations
+    const apiUrl = `https://data.cityofnewyork.us/resource/nfid-uabd.json?$where=within_circle(location, ${lat}, ${lng}, 200)&$limit=10`;
     
-    console.log("Fetching street cleaning data from: " + apiUrl);
+    // Add the API token to the request
+    const apiToken = "1r6xccw69z7kaws6kymmudflv";
+    const headers = {
+        "X-App-Token": apiToken
+    };
     
-    fetch(apiUrl)
+    console.log("Fetching parking regulation data from: " + apiUrl);
+    
+    fetch(apiUrl, { headers: headers })
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
@@ -252,20 +258,20 @@ function getStreetCleaningSchedule(lat, lng) {
         .then(data => {
             loadingIndicator.style.display = 'none';
             
-            console.log("Received street cleaning data:", data);
+            console.log("Received parking regulation data:", data);
             
             if (data && data.length > 0) {
-                // Create info control for street cleaning schedule
+                // Create info control for parking regulations
                 displayStreetCleaningInfo(data);
-                showStatus(`Found ${data.length} street cleaning schedules for this area.`);
+                showStatus(`Found ${data.length} parking regulations for this area.`);
             } else {
-                showStatus('No street cleaning data found for this location. Trying alternate data source...');
+                showStatus('No parking regulations found for this location. Trying alternate data source...');
                 // Try to get alternate side parking data as fallback
                 getAlternateSideParkingData(lat, lng);
             }
         })
         .catch(error => {
-            console.error('Error fetching street cleaning data:', error);
+            console.error('Error fetching parking regulation data:', error);
             loadingIndicator.style.display = 'none';
             showStatus('Loading...');
             
@@ -278,9 +284,15 @@ function getAlternateSideParkingData(lat, lng) {
     // Use a different endpoint for alternate side parking rules
     const apiUrl = `https://data.cityofnewyork.us/resource/faiq-9dfq.json?$where=within_circle(location, ${lat}, ${lng}, 300)&$limit=10`;
     
+    // Add the API token to the request
+    const apiToken = "1r6xccw69z7kaws6kymmudflv";
+    const headers = {
+        "X-App-Token": apiToken
+    };
+    
     console.log("Fetching alternate side parking data from: " + apiUrl);
     
-    fetch(apiUrl)
+    fetch(apiUrl, { headers: headers })
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
@@ -288,6 +300,7 @@ function getAlternateSideParkingData(lat, lng) {
             return response.json();
         })
         .then(data => {
+            // Rest of the function remains unchanged
             loadingIndicator.style.display = 'none';
             
             console.log("Received alternate side parking data:", data);
@@ -296,10 +309,10 @@ function getAlternateSideParkingData(lat, lng) {
                 displayStreetCleaningInfo(data, true);
                 showStatus(`Found ${data.length} alternate side parking regulations for this area.`);
             } else {
-                // Last resort - try the parking regulations dataset
+                // Last resort - try the parking regulations dataset, also with the token
                 const parkingUrl = `https://data.cityofnewyork.us/resource/xswq-wnv9.json?$where=within_circle(location, ${lat}, ${lng}, 300)&$limit=10&$select=distinct sign_description,order_number,street,borough,location`;
                 
-                fetch(parkingUrl)
+                fetch(parkingUrl, { headers: headers })
                     .then(resp => resp.json())
                     .then(parkingData => {
                         if (parkingData && parkingData.length > 0) {
@@ -717,8 +730,14 @@ function loadParkingSigns(lat, lng) {
     // Search radius in meters (increase for more results)
     const radius = 200;
     
-    // Using NYC Open Data API directly (may have CORS issues)
-    const apiUrl = `https://data.cityofnewyork.us/resource/xswq-wnv9.json?$where=within_circle(location, ${lat}, ${lng}, ${radius})&$limit=50`;
+    // Using the new NYC Parking Regulation API
+    const apiUrl = `https://data.cityofnewyork.us/resource/nfid-uabd.json?$where=within_circle(location, ${lat}, ${lng}, ${radius})&$limit=50`;
+    
+    // Add the API token to the request
+    const apiToken = "1r6xccw69z7kaws6kymmudflv";
+    const headers = {
+        "X-App-Token": apiToken
+    };
     
     // Sample data if API doesn't work
     let useSampleData = false;
@@ -731,7 +750,7 @@ function loadParkingSigns(lat, lng) {
     
     console.log("Fetching from: " + apiUrl);
     
-    fetch(apiUrl)
+    fetch(apiUrl, { headers: headers })
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
@@ -746,7 +765,7 @@ function loadParkingSigns(lat, lng) {
             if (data && data.length > 0) {
                 data.forEach(sign => {
                     try {
-                        // Attempt to extract location data
+                        // Attempt to extract location data - this can vary based on API response format
                         let signLat, signLng;
                         
                         if (sign.location && sign.location.coordinates) {
@@ -770,17 +789,17 @@ function loadParkingSigns(lat, lng) {
                         }
                         
                         // Create sign description
-                        const signType = sign.sign_description || sign.signdesc || "Parking Sign";
+                        const signType = sign.signdesc || sign.sign_description || "Parking Sign";
                         
                         // Build detailed description from available fields
                         let signDetails = '';
                         
                         // Try different field names that might be in the API
                         const potentialFields = [
-                            'days_description', 'daysdesc', 'days',
-                            'time_limits_description', 'timelimitdesc', 'time_limits',
-                            'order_number', 'ordernumber',
-                            'seq_num', 'seqnum'
+                            'days', 'daysdesc', 'days_description',
+                            'timelimit', 'timelimitdesc', 'time_limits',
+                            'ordernumber', 'order_number',
+                            'seqnum', 'seq_num'
                         ];
                         
                         potentialFields.forEach(field => {
