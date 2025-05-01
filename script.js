@@ -241,7 +241,7 @@ function getStreetCleaningSchedule(lat, lng) {
     const apiUrl = `https://data.cityofnewyork.us/resource/nfid-uabd.json?$where=within_circle(location, ${lat}, ${lng}, 200)&$limit=10`;
     
     // Add the API token to the request
-    const apiToken = "1r6xccw69z7kaws6kymmudflv";
+    const apiToken = "FcPWK08jZ0p37WqjzGoBF2dNV";
     const headers = {
         "X-App-Token": apiToken
     };
@@ -285,7 +285,7 @@ function getAlternateSideParkingData(lat, lng) {
     const apiUrl = `https://data.cityofnewyork.us/resource/faiq-9dfq.json?$where=within_circle(location, ${lat}, ${lng}, 300)&$limit=10`;
     
     // Add the API token to the request
-    const apiToken = "1r6xccw69z7kaws6kymmudflv";
+    const apiToken = "FcPWK08jZ0p37WqjzGoBF2dNV";
     const headers = {
         "X-App-Token": apiToken
     };
@@ -734,7 +734,7 @@ function loadParkingSigns(lat, lng) {
     const apiUrl = `https://data.cityofnewyork.us/resource/nfid-uabd.json?$where=within_circle(location, ${lat}, ${lng}, ${radius})&$limit=50`;
     
     // Add the API token to the request
-    const apiToken = "1r6xccw69z7kaws6kymmudflv";
+    const apiToken = "FcPWK08jZ0p37WqjzGoBF2dNV";
     const headers = {
         "X-App-Token": apiToken
     };
