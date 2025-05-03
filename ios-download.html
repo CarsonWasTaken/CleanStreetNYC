@@ -23,6 +23,7 @@
         .header {
             background-color: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid #d2d2d7;
             padding: 15px 20px;
             display: flex;
@@ -42,7 +43,7 @@
         }
         
         .app-container {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 40px 20px;
             display: flex;
@@ -103,68 +104,116 @@
             margin-left: 10px;
         }
         
+        .download-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
         .download-btn {
             background-color: #0066cc;
             color: white;
             border-radius: 20px;
-            padding: 8px 25px;
+            padding: 12px 30px;
             font-size: 17px;
             font-weight: 600;
             border: none;
             cursor: pointer;
             margin-top: 10px;
+            transition: all 0.2s ease;
+        }
+        
+        .download-btn:hover {
+            background-color: #0055b3;
+            transform: scale(1.02);
+        }
+        
+        .app-size {
+            color: #86868b;
+            font-size: 13px;
+            margin-top: 8px;
+        }
+        
+        .screenshots-section {
+            width: 100%;
+            margin: 40px 0;
         }
         
         .screenshots {
             width: 100%;
-            margin-top: 40px;
             display: flex;
             overflow-x: auto;
-            gap: 20px;
-            padding: 10px 0;
+            gap: 25px;
+            padding: 20px 0;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        
+        .screenshots::-webkit-scrollbar {
+            display: none;
         }
         
         .screenshot {
             flex-shrink: 0;
-            height: 500px;
-            border-radius: 20px;
+            height: 600px;
+            width: 300px;
+            border-radius: 30px;
             overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            border: 1px solid #e5e5e5;
+        }
+        
+        .screenshot:hover {
+            transform: translateY(-5px);
         }
         
         .screenshot img {
             height: 100%;
+            width: 100%;
             object-fit: cover;
         }
         
         .section-title {
-            font-size: 24px;
+            font-size: 28px;
             font-weight: 600;
-            margin: 30px 0 20px;
+            margin: 40px 0 20px;
             width: 100%;
         }
         
         .description {
-            font-size: 16px;
-            line-height: 1.5;
+            font-size: 17px;
+            line-height: 1.6;
             color: #1d1d1f;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
+            max-width: 800px;
         }
         
         .feature-list {
-            margin-bottom: 30px;
+            margin-bottom: 50px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
         }
         
         .feature {
             display: flex;
             align-items: flex-start;
-            margin-bottom: 20px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease;
+        }
+        
+        .feature:hover {
+            transform: translateY(-5px);
         }
         
         .feature-icon {
-            width: 30px;
-            height: 30px;
-            border-radius: 7px;
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
             background-color: #ffd100;
             margin-right: 15px;
             display: flex;
@@ -172,6 +221,7 @@
             justify-content: center;
             color: #212529;
             flex-shrink: 0;
+            font-size: 20px;
         }
         
         .feature-text {
@@ -180,13 +230,14 @@
         
         .feature-title {
             font-weight: 600;
-            margin-bottom: 5px;
+            font-size: 18px;
+            margin-bottom: 8px;
         }
         
         .feature-desc {
-            color: #86868b;
+            color: #555;
             font-size: 14px;
-            line-height: 1.4;
+            line-height: 1.5;
         }
         
         .logo-broom {
@@ -210,14 +261,272 @@
             padding: 20px 0;
             border-top: 1px solid #d2d2d7;
             border-bottom: 1px solid #d2d2d7;
+            display: flex;
+            align-items: center;
         }
         
         .age-badge {
             display: inline-block;
-            padding: 2px 8px;
-            border-radius: 4px;
+            padding: 4px 10px;
+            border-radius: 20px;
             background-color: #eee;
-            font-size: 12px;
+            font-size: 13px;
+            margin-right: 15px;
+            font-weight: 600;
+        }
+        
+        .privacy-section {
+            display: flex;
+            margin-top: 20px;
+            margin-bottom: 40px;
+            gap: 40px;
+        }
+        
+        .privacy-card {
+            flex: 1;
+            background-color: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        
+        .privacy-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .privacy-title i {
+            margin-right: 10px;
+            color: #0066cc;
+        }
+        
+        .privacy-content {
+            color: #555;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        /* Reviews section */
+        .reviews-section {
+            width: 100%;
+            margin: 40px 0;
+        }
+        
+        .reviews-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .reviews-title {
+            font-size: 28px;
+            font-weight: 600;
+        }
+        
+        .write-review-btn {
+            color: #0066cc;
+            border: none;
+            background: none;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        .reviews-summary {
+            display: flex;
+            margin-bottom: 30px;
+            background-color: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        
+        .overall-rating {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-right: 30px;
+            border-right: 1px solid #e5e5e5;
+            margin-right: 30px;
+        }
+        
+        .large-rating {
+            font-size: 60px;
+            font-weight: 600;
+            line-height: 1;
+            margin-bottom: 10px;
+        }
+        
+        .large-stars {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        
+        .large-star {
+            color: #ffc107;
+            font-size: 24px;
+            margin-right: 4px;
+        }
+        
+        .rating-out-of {
+            color: #86868b;
+            font-size: 14px;
+        }
+        
+        .rating-breakdown {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .rating-bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .rating-label {
+            width: 30px;
+            font-size: 14px;
+            color: #555;
+            margin-right: 10px;
+        }
+        
+        .progress-bar {
+            flex: 1;
+            height: 8px;
+            background-color: #e5e5e5;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-right: 15px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: #ffc107;
+        }
+        
+        .progress-percent {
+            width: 40px;
+            font-size: 14px;
+            color: #86868b;
+        }
+        
+        .reviews-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .review {
+            background-color: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        
+        .reviewer-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .reviewer-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .review-date {
+            font-size: 14px;
+            color: #86868b;
+        }
+        
+        .review-rating {
+            display: flex;
+        }
+        
+        .review-content {
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+        
+        .review-version {
+            font-size: 14px;
+            color: #86868b;
+        }
+        
+        .helpful-section {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 15px;
+            font-size: 14px;
+            color: #555;
+        }
+        
+        .helpful-btn {
+            color: #0066cc;
+            border: none;
+            background: none;
+            cursor: pointer;
+            margin-left: 15px;
+        }
+        
+        .ios-cta {
+            width: 100%;
+            background-color: white;
+            text-align: center;
+            padding: 50px 20px;
+            border-radius: 16px;
+            margin: 40px 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        
+        .ios-cta h2 {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        
+        .ios-cta p {
+            font-size: 18px;
+            color: #555;
+            margin-bottom: 30px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .apple-download-btn {
+            display: inline-flex;
+            align-items: center;
+            background-color: black;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .apple-download-btn:hover {
+            background-color: #333;
+            transform: scale(1.02);
+        }
+        
+        .apple-download-btn i {
+            font-size: 24px;
             margin-right: 10px;
         }
         
@@ -238,8 +547,35 @@
                 justify-content: center;
             }
             
+            .download-container {
+                align-items: center;
+            }
+            
+            .reviews-summary {
+                flex-direction: column;
+            }
+            
+            .overall-rating {
+                padding-right: 0;
+                border-right: none;
+                margin-right: 0;
+                padding-bottom: 20px;
+                border-bottom: 1px solid #e5e5e5;
+                margin-bottom: 20px;
+            }
+            
+            .privacy-section {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
             .screenshot {
-                height: 400px;
+                height: 500px;
+                width: 250px;
+            }
+            
+            .feature-list {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -275,22 +611,30 @@
                     <div class="rating-count">1.2K Ratings</div>
                 </div>
                 
-                <button class="download-btn">GET</button>
+                <div class="download-container">
+                    <button class="download-btn">GET</button>
+                    <div class="app-size">23.5 MB</div>
+                </div>
             </div>
         </div>
         
-        <div class="screenshots">
-            <div class="screenshot">
-                <img src="/api/placeholder/280/600" alt="App Screenshot 1">
-            </div>
-            <div class="screenshot">
-                <img src="/api/placeholder/280/600" alt="App Screenshot 2">
-            </div>
-            <div class="screenshot">
-                <img src="/api/placeholder/280/600" alt="App Screenshot 3">
-            </div>
-            <div class="screenshot">
-                <img src="/api/placeholder/280/600" alt="App Screenshot 4">
+        <div class="screenshots-section">
+            <div class="screenshots">
+                <div class="screenshot">
+                    <img src="/api/placeholder/300/600" alt="App Screenshot 1">
+                </div>
+                <div class="screenshot">
+                    <img src="/api/placeholder/300/600" alt="App Screenshot 2">
+                </div>
+                <div class="screenshot">
+                    <img src="/api/placeholder/300/600" alt="App Screenshot 3">
+                </div>
+                <div class="screenshot">
+                    <img src="/api/placeholder/300/600" alt="App Screenshot 4">
+                </div>
+                <div class="screenshot">
+                    <img src="/api/placeholder/300/600" alt="App Screenshot 5">
+                </div>
             </div>
         </div>
         
@@ -340,6 +684,196 @@
                 <div class="feature-text">
                     <div class="feature-title">Countdown Timer</div>
                     <div class="feature-desc">See exactly how much time is left until street cleaning begins or ends for any location.</div>
+                </div>
+            </div>
+            
+            <div class="feature">
+                <div class="feature-icon">
+                    <i class="fas fa-car"></i>
+                </div>
+                <div class="feature-text">
+                    <div class="feature-title">Parking Spot Finder</div>
+                    <div class="feature-desc">Find available parking spots near you that won't be affected by upcoming street cleaning.</div>
+                </div>
+            </div>
+            
+            <div class="feature">
+                <div class="feature-icon">
+                    <i class="fas fa-history"></i>
+                </div>
+                <div class="feature-text">
+                    <div class="feature-title">Schedule Changes</div>
+                    <div class="feature-desc">Stay updated on any changes to the street cleaning schedule due to holidays, special events, or emergency situations.</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Reviews Section (New) -->
+        <h2 class="section-title">Ratings & Reviews</h2>
+        <div class="reviews-section">
+            <div class="reviews-header">
+                <div class="reviews-title">What Users Are Saying</div>
+                <button class="write-review-btn">Write a Review</button>
+            </div>
+            
+            <div class="reviews-summary">
+                <div class="overall-rating">
+                    <div class="large-rating">4.8</div>
+                    <div class="large-stars">
+                        <div class="large-star"><i class="fas fa-star"></i></div>
+                        <div class="large-star"><i class="fas fa-star"></i></div>
+                        <div class="large-star"><i class="fas fa-star"></i></div>
+                        <div class="large-star"><i class="fas fa-star"></i></div>
+                        <div class="large-star"><i class="fas fa-star-half-alt"></i></div>
+                    </div>
+                    <div class="rating-out-of">out of 5</div>
+                    <div class="rating-count">1,236 Ratings</div>
+                </div>
+                
+                <div class="rating-breakdown">
+                    <div class="rating-bar">
+                        <div class="rating-label">5★</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 85%;"></div>
+                        </div>
+                        <div class="progress-percent">85%</div>
+                    </div>
+                    <div class="rating-bar">
+                        <div class="rating-label">4★</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 12%;"></div>
+                        </div>
+                        <div class="progress-percent">12%</div>
+                    </div>
+                    <div class="rating-bar">
+                        <div class="rating-label">3★</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 2%;"></div>
+                        </div>
+                        <div class="progress-percent">2%</div>
+                    </div>
+                    <div class="rating-bar">
+                        <div class="rating-label">2★</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 0.5%;"></div>
+                        </div>
+                        <div class="progress-percent">0.5%</div>
+                    </div>
+                    <div class="rating-bar">
+                        <div class="rating-label">1★</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 0.5%;"></div>
+                        </div>
+                        <div class="progress-percent">0.5%</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="reviews-list">
+                <div class="review">
+                    <div class="review-header">
+                        <div class="reviewer-info">
+                            <div class="reviewer-name">Brooklyn Driver</div>
+                            <div class="review-date">April 28, 2025</div>
+                        </div>
+                        <div class="review-rating">
+                            <div class="star"><i class="fas fa-star"></i></div>
+                            <div class="star"><i class="fas fa-star"></i></div>
+                            <div class="star"><i class="fas fa-star"></i></div>
+                            <div class="star"><i class="fas fa-star"></i></div>
+                            <div class="star"><i class="fas fa-star"></i></div>
+                        </div>
+                    </div>
+                    <div class="review-content">
+                        This app is a lifesaver! I've lived in New York for 10 years and alternate side parking has always been a nightmare. Since downloading CleanstreetNYC, I haven't received a single ticket. The notifications work perfectly and the map is super easy to use. I can't imagine parking in the city without it now.
+                    </div>
+                    <div class="review-version">Version 2.4.1</div>
+                    <div class="helpful-section">
+                        Was this helpful? 
+                        <button class="helpful-btn">Yes</button>
+                        <button class="helpful-btn">No</button>
+                    </div>
+                </div>
+                
+                <div class="review">
+                    <div class="review-header">
+                        <div class="reviewer-info">
+                            <div class="reviewer-name">Queens Commuter</div>
+                            <div class="review-date">April 15, 2025</div>
+                        </div>
+                        <div class="review-rating">
+                            <div class="star"><i class="fas fa-star"></i></div>
+                            <div class="star"><i class="fas fa-star"></i></div>
+                            <div class="star"><i class="fas fa-star"></i></div>
+                            <div class="star"><i class="fas fa-star"></i></div>
+                            <div class="star"><i class="fas fa-star"></i></div>
+                        </div>
+                    </div>
+                    <div class="review-content">
+                        Best parking app I've ever used! The countdown timer feature is genius - I know exactly when I need to move my car. The weekly calendar view helps me plan my schedule around street cleaning days. Worth every penny!
+                    </div>
+                    <div class="review-version">Version 2.4.0</div>
+                    <div class="helpful-section">
+                        Was this helpful? 
+                        <button class="helpful-btn">Yes</button>
+                        <button class="helpful-btn">No</button>
+                    </div>
+                </div>
+                
+                <div class="review">
+                    <div class="review-header">
+                        <div class="reviewer-info">
+                            <div class="reviewer-name">Manhattan Resident</div>
+                            <div class="review-date">April 2, 2025</div>
+                        </div>
+                        <div class="review-rating">
+                            <div class="star"><i class="fas fa-star"></i></div>
+                            <div class="star"><i class="fas fa-star"></i></div>
+                            <div class="star"><i class="fas fa-star"></i></div>
+                            <div class="star"><i class="fas fa-star"></i></div>
+                            <div class="star"><i class="far fa-star"></i></div>
+                        </div>
+                    </div>
+                    <div class="review-content">
+                        Really good app overall! The map is accurate and the notifications work great. I'd give it 5 stars if it had a feature to share parking spots with friends. Also, it would be nice to have a dark mode option. Otherwise, fantastic app that has saved me from countless tickets.
+                    </div>
+                    <div class="review-version">Version 2.3.8</div>
+                    <div class="helpful-section">
+                        Was this helpful? 
+                        <button class="helpful-btn">Yes</button>
+                        <button class="helpful-btn">No</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- iOS-style CTA -->
+        <div class="ios-cta">
+            <h2>Park Smarter, Not Harder</h2>
+            <p>Join thousands of New Yorkers who save time, money, and frustration with the #1 street cleaning and alternate side parking app in NYC.</p>
+            <a href="#" class="apple-download-btn">
+                <i class="fab fa-apple"></i> Download on the App Store
+            </a>
+        </div>
+        
+        <!-- Privacy Section -->
+        <h2 class="section-title">App Privacy</h2>
+        <div class="privacy-section">
+            <div class="privacy-card">
+                <div class="privacy-title">
+                    <i class="fas fa-lock"></i> Data Privacy
+                </div>
+                <div class="privacy-content">
+                    The developer, NYC 311 Services, indicated that the app's privacy practices may include handling of data as described below. For more information, see the developer's privacy policy.
+                </div>
+            </div>
+            
+            <div class="privacy-card">
+                <div class="privacy-title">
+                    <i class="fas fa-map-pin"></i> Location Data
+                </div>
+                <div class="privacy-content">
+                    Your location data is used only to show you relevant parking information for your area. Your location is never shared with third parties and is only stored locally on your device.
                 </div>
             </div>
         </div>
