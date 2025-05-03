@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CleanstreetNYC - NYC Street Cleaning Signs Map</title>
     <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
         * {
             margin: 0;
             padding: 0;
@@ -180,10 +185,31 @@
         .app-badge {
             height: 50px;
             transition: transform 0.3s ease;
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
         }
         
         .app-badge:hover {
             transform: scale(1.05);
+        }
+        
+        .app-badge-apple {
+            background-color: #000;
+        }
+        
+        .app-badge-android {
+            background-color: #01875f;
+        }
+        
+        .app-badge i {
+            font-size: 24px;
+            margin-right: 10px;
         }
         
         /* Mobile responsiveness */
@@ -234,11 +260,11 @@
         
         <!-- App store badges - these will link to the app download page -->
         <div class="app-badges">
-            <a href="ios-download.html">
-                <img src="https://cdnjs.cloudflare.com/ajax/libs/simple-icons/6.0.0/apple.svg" alt="Download on App Store" class="app-badge" style="background: white; padding: 8px; border-radius: 8px; width: 135px;">
+            <a href="ios-download.html" class="app-badge app-badge-apple">
+                <i class="fab fa-apple"></i> Download for iOS
             </a>
-            <a href="android-download.html">
-                <img src="https://cdnjs.cloudflare.com/ajax/libs/simple-icons/6.0.0/googleplay.svg" alt="Get it on Google Play" class="app-badge" style="background: white; padding: 8px; border-radius: 8px; width: 135px;">
+            <a href="android-download.html" class="app-badge app-badge-android">
+                <i class="fab fa-android"></i> Download for Android
             </a>
         </div>
         
