@@ -169,23 +169,6 @@
             margin-right: 8px;
         }
         
-        /* App store badges */
-        .app-badges {
-            display: flex;
-            gap: 15px;
-            margin-top: 30px;
-            justify-content: center;
-        }
-        
-        .app-badge {
-            height: 50px;
-            transition: transform 0.3s ease;
-        }
-        
-        .app-badge:hover {
-            transform: scale(1.05);
-        }
-        
         /* Mobile responsiveness */
         @media (max-width: 768px) {
             .welcome-text {
@@ -203,11 +186,6 @@
             .feature-card {
                 width: 100%;
                 max-width: 300px;
-            }
-            
-            .app-badges {
-                flex-direction: column;
-                align-items: center;
             }
         }
     </style>
@@ -229,17 +207,7 @@
         
         <div class="buttons">
             <a href="login.html" class="btn btn-primary">Sign In</a>
-            <a href="download.html" class="btn btn-secondary">Download App</a>
-        </div>
-        
-        <!-- App store badges - these will link to the app download page -->
-        <div class="app-badges">
-            <a href="download.html">
-                <img src="https://cdnjs.cloudflare.com/ajax/libs/simple-icons/6.0.0/apple.svg" alt="Download on App Store" class="app-badge" style="background: white; padding: 8px; border-radius: 8px; width: 135px;">
-            </a>
-            <a href="download.html">
-                <img src="https://cdnjs.cloudflare.com/ajax/libs/simple-icons/6.0.0/googleplay.svg" alt="Get it on Google Play" class="app-badge" style="background: white; padding: 8px; border-radius: 8px; width: 135px;">
-            </a>
+            <a href="#" class="btn btn-primary" onclick="confirmGuestMode();">Skip to Map</a>
         </div>
         
         <div class="features">
@@ -259,21 +227,15 @@
                 <p class="feature-desc">Get notifications about upcoming street cleaning for your saved locations.</p>
             </div>
             
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-calendar-alt"></i>
+            <a href="weekly-schedule.html" style="text-decoration: none; color: inherit;">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <h3 class="feature-title">Weekly Schedule</h3>
+                    <p class="feature-desc">View a weekly overview of street cleaning times for your neighborhood.</p>
                 </div>
-                <h3 class="feature-title">Weekly Schedule</h3>
-                <p class="feature-desc">View a weekly overview of street cleaning times for your neighborhood.</p>
-            </div>
-            
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-mobile-alt"></i>
-                </div>
-                <h3 class="feature-title">Mobile App</h3>
-                <p class="feature-desc">Access all features on the go with our CleanstreetNYC mobile application.</p>
-            </div>
+            </a>
         </div>
     </div>
     
@@ -290,6 +252,15 @@
                 window.location.href = 'map.html';
             }
         });
+        
+        // Function to confirm guest mode with a warning
+        function confirmGuestMode() {
+            if (confirm("Warning: In guest mode, you won't be able to save or bookmark addresses, and you will not receive future notifications. Continue without signing in?")) {
+                // User confirmed, set guest mode and redirect
+                localStorage.setItem('cleanstreetGuestMode', 'true');
+                window.location.href = 'map.html';
+            }
+        }
     </script>
 </body>
 </html>
