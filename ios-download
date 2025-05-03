@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CleanstreetNYC - Download iOS App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f7;
+            color: #1d1d1f;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            background-color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid #d2d2d7;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .back-button {
+            color: #0066cc;
+            text-decoration: none;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .app-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            display: flex;
+            flex-wrap: wrap;
+        }
+        
+        .app-info {
+            display: flex;
+            width: 100%;
+            margin-bottom: 30px;
+        }
+        
+        .app-icon {
+            width: 170px;
+            height: 170px;
+            border-radius: 30px;
+            background-color: #212529;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-right: 30px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .app-details {
+            flex: 1;
+        }
+        
+        .app-name {
+            font-size: 34px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .developer {
+            font-size: 20px;
+            color: #0066cc;
+            margin-bottom: 15px;
+        }
+        
+        .ratings {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .rating-score {
+            font-size: 20px;
+            font-weight: 600;
+            margin-right: 5px;
+        }
+        
+        .rating-count {
+            color: #86868b;
+            font-size: 16px;
+            margin-left: 10px;
+        }
+        
+        .download-btn {
+            background-color: #0066cc;
+            color: white;
+            border-radius: 20px;
+            padding: 8px 25px;
+            font-size: 17px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        
+        .screenshots {
+            width: 100%;
+            margin-top: 40px;
+            display: flex;
+            overflow-x: auto;
+            gap: 20px;
+            padding: 10px 0;
+        }
+        
+        .screenshot {
+            flex-shrink: 0;
+            height: 500px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .screenshot img {
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 30px 0 20px;
+            width: 100%;
+        }
+        
+        .description {
+            font-size: 16px;
+            line-height: 1.5;
+            color: #1d1d1f;
+            margin-bottom: 30px;
+        }
+        
+        .feature-list {
+            margin-bottom: 30px;
+        }
+        
+        .feature {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+        
+        .feature-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 7px;
+            background-color: #ffd100;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #212529;
+            flex-shrink: 0;
+        }
+        
+        .feature-text {
+            flex: 1;
+        }
+        
+        .feature-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .feature-desc {
+            color: #86868b;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        .logo-broom {
+            color: #ffd100;
+            font-size: 80px;
+        }
+        
+        .stars {
+            display: flex;
+            margin: 0 10px;
+        }
+        
+        .star {
+            color: #ffc107;
+            font-size: 20px;
+            margin-right: 2px;
+        }
+        
+        .age-rating {
+            margin-top: 20px;
+            padding: 20px 0;
+            border-top: 1px solid #d2d2d7;
+            border-bottom: 1px solid #d2d2d7;
+        }
+        
+        .age-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background-color: #eee;
+            font-size: 12px;
+            margin-right: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .app-info {
+                flex-direction: column;
+            }
+            
+            .app-icon {
+                margin: 0 auto 20px;
+            }
+            
+            .app-details {
+                text-align: center;
+            }
+            
+            .ratings {
+                justify-content: center;
+            }
+            
+            .screenshot {
+                height: 400px;
+            }
+        }
+    </style>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="header">
+        <a href="index.html" class="back-button">
+            <i class="fas fa-chevron-left" style="margin-right: 5px;"></i> Back
+        </a>
+    </div>
+    
+    <div class="app-container">
+        <div class="app-info">
+            <div class="app-icon">
+                <i class="fas fa-broom logo-broom"></i>
+            </div>
+            
+            <div class="app-details">
+                <h1 class="app-name">CleanstreetNYC</h1>
+                <div class="developer">NYC 311 Services</div>
+                
+                <div class="ratings">
+                    <div class="rating-score">4.8</div>
+                    <div class="stars">
+                        <div class="star"><i class="fas fa-star"></i></div>
+                        <div class="star"><i class="fas fa-star"></i></div>
+                        <div class="star"><i class="fas fa-star"></i></div>
+                        <div class="star"><i class="fas fa-star"></i></div>
+                        <div class="star"><i class="fas fa-star-half-alt"></i></div>
+                    </div>
+                    <div class="rating-count">1.2K Ratings</div>
+                </div>
+                
+                <button class="download-btn">GET</button>
+            </div>
+        </div>
+        
+        <div class="screenshots">
+            <div class="screenshot">
+                <img src="/api/placeholder/280/600" alt="App Screenshot 1">
+            </div>
+            <div class="screenshot">
+                <img src="/api/placeholder/280/600" alt="App Screenshot 2">
+            </div>
+            <div class="screenshot">
+                <img src="/api/placeholder/280/600" alt="App Screenshot 3">
+            </div>
+            <div class="screenshot">
+                <img src="/api/placeholder/280/600" alt="App Screenshot 4">
+            </div>
+        </div>
+        
+        <h2 class="section-title">About</h2>
+        <div class="description">
+            CleanstreetNYC is your essential companion for navigating NYC's street cleaning schedules and parking regulations. Never get a ticket again! With our interactive map, personalized alerts, and weekly calendar view, you'll always know when and where it's safe to park throughout the five boroughs.
+            <br><br>
+            Powered by NYC's official 311 Open Data, our app provides the most accurate and up-to-date information about alternate side parking and street cleaning times across New York City.
+        </div>
+        
+        <h2 class="section-title">Features</h2>
+        <div class="feature-list">
+            <div class="feature">
+                <div class="feature-icon">
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <div class="feature-text">
+                    <div class="feature-title">Interactive Street Cleaning Map</div>
+                    <div class="feature-desc">Visualize street cleaning schedules for any location in NYC. Simply enter an address or use your current location to see all nearby parking regulations.</div>
+                </div>
+            </div>
+            
+            <div class="feature">
+                <div class="feature-icon">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <div class="feature-text">
+                    <div class="feature-title">Cleaning Alerts & Notifications</div>
+                    <div class="feature-desc">Receive timely notifications about upcoming street cleaning for your saved locations. Get reminders when you need to move your car.</div>
+                </div>
+            </div>
+            
+            <div class="feature">
+                <div class="feature-icon">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <div class="feature-text">
+                    <div class="feature-title">Weekly Schedule View</div>
+                    <div class="feature-desc">Plan ahead with a complete weekly calendar of street cleaning times for your neighborhood, including holiday suspensions.</div>
+                </div>
+            </div>
+            
+            <div class="feature">
+                <div class="feature-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="feature-text">
+                    <div class="feature-title">Countdown Timer</div>
+                    <div class="feature-desc">See exactly how much time is left until street cleaning begins or ends for any location.</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="age-rating">
+            <span class="age-badge">4+</span> Age Appropriate
+        </div>
+    </div>
+</body>
+</html>
